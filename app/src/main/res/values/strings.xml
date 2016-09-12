@@ -7,8 +7,8 @@
     <string name="action_change_units">Change Units</string>
     <string name="symbol_search">Symbol Search</string>
     <string name="content_test">Search for a Stock Symbol</string>
-    <string name="input_hint">FB</string>
-    <string name="input_prefill"></string>
+    <string name="input_hint" translatable="false">FB</string>
+    <string name="input_prefill" translatable="false"/>
     <string name="network_toast">Uh-oh! This app requires an internet connection</string>
     <string name="button_refresh">Refresh</string>
     <string name="network_toast_outdated_data">Because no network is available, your data may be outdated.</string>
