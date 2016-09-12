@@ -13,7 +13,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by sam_chordas on 10/8/15.
@@ -54,8 +57,8 @@ public class Utils {
         return batchOperations;
     }
 
-    public static String truncateBidPrice(String bidPrice) throws NumberFormatException{
-        bidPrice = String.format("%.2f", Float.parseFloat(bidPrice));
+    public static String truncateBidPrice(String bidPrice) throws NumberFormatException {
+        bidPrice = String.format(Locale.US, "%.2f", Float.parseFloat(bidPrice));
         return bidPrice;
     }
 
@@ -79,6 +82,7 @@ public class Utils {
     public static ContentProviderOperation buildBatchOperation(JSONObject jsonObject) throws NumberFormatException {
         ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
                 QuoteProvider.Quotes.CONTENT_URI);
+
         try {
             String change = jsonObject.getString("Change");
             builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol"));
@@ -87,6 +91,7 @@ public class Utils {
                     jsonObject.getString("ChangeinPercent"), true));
             builder.withValue(QuoteColumns.CHANGE, truncateChange(change, false));
             builder.withValue(QuoteColumns.ISCURRENT, 1);
+            builder.withValue(QuoteColumns.CREATED, getCurrentTimeString());
             if (change.charAt(0) == '-') {
                 builder.withValue(QuoteColumns.ISUP, 0);
             } else {
@@ -97,6 +102,14 @@ public class Utils {
             e.printStackTrace();
         }
         return builder.build();
+    }
+
+    private static String getCurrentTimeString() {
+        Calendar c = Calendar.getInstance();
+        Log.d(LOG_TAG, "Current time => " + c.getTime());
+
+        SimpleDateFormat df = new SimpleDateFormat("HH:ss", Locale.getDefault());
+        return df.format(c.getTime());
     }
 
     public static boolean isConnectedToNetwork(Context context) {
