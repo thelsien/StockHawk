@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +18,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,33 +53,36 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     private QuoteCursorAdapter mCursorAdapter;
     private Context mContext;
     private Cursor mCursor;
-    boolean isConnected;
+//    boolean isConnected;
+
+    private boolean mIsPeriodicGCMTaskStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_stocks);
 
         mContext = this;
 
-        isConnected = Utils.isNetworkAvailable(this);
+        setContentView(R.layout.activity_my_stocks);
+
         // The intent service is for executing immediate pulls from the Yahoo API
         // GCMTaskService can only schedule tasks, they cannot execute immediately
         mServiceIntent = new Intent(this, StockIntentService.class);
         if (savedInstanceState == null) {
             // Run the initialize task service so that some stocks appear upon an empty database
             mServiceIntent.putExtra("tag", "init");
-            if (isConnected) {
+            if (Utils.isConnectedToNetwork(mContext)) {
                 startService(mServiceIntent);
+            } else {
+                networkToast();
+                updateEmptyView();
             }
         }
-        TextView emptyView = (TextView) findViewById(R.id.empty_view);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
-        mCursorAdapter = new QuoteCursorAdapter(this, null, emptyView);
+        mCursorAdapter = new QuoteCursorAdapter(this, null);
         recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(this,
                 new RecyclerViewItemClickListener.OnItemClickListener() {
                     @Override
@@ -91,10 +96,24 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.attachToRecyclerView(recyclerView);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener(getFABOnClickListener());
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(recyclerView);
+
+        mTitle = getTitle();
+        if (Utils.isConnectedToNetwork(mContext)) {
+            startPeriodicGCMTask();
+        }
+    }
+
+    @NonNull
+    private View.OnClickListener getFABOnClickListener() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isConnected) {
+                if (Utils.isConnectedToNetwork(mContext)) {
                     new MaterialDialog.Builder(mContext).title(R.string.symbol_search)
                             .content(R.string.content_test)
                             .inputType(InputType.TYPE_CLASS_TEXT)
@@ -127,34 +146,76 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 }
 
             }
-        });
+        };
+    }
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
+    private void startPeriodicGCMTask() {
+        long period = 3600L;
+        long flex = 10L;
+        String periodicTag = "periodic";
 
-        mTitle = getTitle();
-        if (isConnected) {
-            long period = 3600L;
-            long flex = 10L;
-            String periodicTag = "periodic";
+        // create a periodic task to pull stocks once every hour after the app has been opened. This
+        // is so Widget data stays up to date.
+        PeriodicTask periodicTask = new PeriodicTask.Builder()
+                .setService(StockTaskService.class)
+                .setPeriod(period)
+                .setFlex(flex)
+                .setTag(periodicTag)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setRequiresCharging(false)
+                .build();
+        // Schedule task with tag "periodic." This ensure that only the stocks present in the DB
+        // are updated.
+        GcmNetworkManager.getInstance(this).schedule(periodicTask);
 
-            // create a periodic task to pull stocks once every hour after the app has been opened. This
-            // is so Widget data stays up to date.
-            PeriodicTask periodicTask = new PeriodicTask.Builder()
-                    .setService(StockTaskService.class)
-                    .setPeriod(period)
-                    .setFlex(flex)
-                    .setTag(periodicTag)
-                    .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                    .setRequiresCharging(false)
-                    .build();
-            // Schedule task with tag "periodic." This ensure that only the stocks present in the DB
-            // are updated.
-            GcmNetworkManager.getInstance(this).schedule(periodicTask);
+        mIsPeriodicGCMTaskStarted = true;
+    }
+
+    private void updateEmptyView() {
+        LinearLayout containerEmpty = (LinearLayout) findViewById(R.id.container_empty);
+        if (containerEmpty != null && containerEmpty.getVisibility() == View.GONE) {
+            containerEmpty.setVisibility(View.VISIBLE);
+
+            Cursor c = getContentResolver().query(
+                    QuoteProvider.Quotes.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            if (c != null) {
+                c.moveToFirst();
+
+                if (c.getCount() > 0) {
+                    TextView emptyView = (TextView) findViewById(R.id.empty_view);
+                    if (emptyView != null) {
+                        emptyView.setText(R.string.network_toast_outdated_data);
+                    }
+                }
+
+                c.close();
+            }
         }
     }
 
+    public void onRefreshButtonClicked(View clickedView) {
+        if (Utils.isConnectedToNetwork(mContext)) {
+            mServiceIntent.putExtra("tag", "init");
+            startService(mServiceIntent);
+
+            if (!mIsPeriodicGCMTaskStarted) {
+                startPeriodicGCMTask();
+            }
+
+            View containerEmptyView = findViewById(R.id.container_empty);
+            if (containerEmptyView != null) {
+                containerEmptyView.setVisibility(View.GONE);
+            }
+        } else {
+            Toast.makeText(mContext, R.string.network_toast, Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     public void onResume() {
@@ -188,9 +249,9 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
+        if (id == R.id.action_settings) {
+            return true;
+        }
 
         if (id == R.id.action_change_units) {
             // this is for changing stock changes from percent value to dollar value
@@ -215,20 +276,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCursorAdapter.swapCursor(data);
-        updateEmptyView();
         mCursor = data;
-    }
-
-    private void updateEmptyView() {
-        if (mCursorAdapter.getItemCount() == 0) {
-            TextView emptyView = (TextView) findViewById(R.id.empty_view);
-            if (emptyView != null) {
-                emptyView.setVisibility(View.VISIBLE);
-                if (!Utils.isNetworkAvailable(this)) {
-                    emptyView.setText(getString(R.string.empty_view_no_network_available));
-                }
-            }
-        }
     }
 
     @Override
