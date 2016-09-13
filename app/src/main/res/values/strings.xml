@@ -14,4 +14,6 @@
     <string name="network_toast_outdated_data">Because no network is available, your data may be outdated.</string>
     <string name="no_quote_available_with_name">No quote available with the given name. Please try again with a valid name.</string>
     <string name="linechart_description_string">Quote data for <xliff:g id="quote_name">%1$s</xliff:g></string>
+    <string name="empty_quotes_list">The list is currently empty. Add new quotes to the list in the app.</string>
+    <string name="title_widget_list">StockHawk List Widget</string>
 </resources>
