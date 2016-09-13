@@ -108,7 +108,7 @@ public class Utils {
         Calendar c = Calendar.getInstance();
         Log.d(LOG_TAG, "Current time => " + c.getTime());
 
-        SimpleDateFormat df = new SimpleDateFormat("HH:ss", Locale.getDefault());
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
         return df.format(c.getTime());
     }
 

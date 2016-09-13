@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/tools">
     <string name="app_name">Stock Hawk</string>
 
     <string name="action_example">Example action</string>
@@ -13,4 +13,5 @@
     <string name="button_refresh">Refresh</string>
     <string name="network_toast_outdated_data">Because no network is available, your data may be outdated.</string>
     <string name="no_quote_available_with_name">No quote available with the given name. Please try again with a valid name.</string>
+    <string name="linechart_description_string">Quote data for <xliff:g id="quote_name">%1$s</xliff:g></string>
 </resources>
