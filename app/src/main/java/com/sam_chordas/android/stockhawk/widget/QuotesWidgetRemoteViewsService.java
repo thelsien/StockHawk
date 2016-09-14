@@ -3,7 +3,6 @@ package com.sam_chordas.android.stockhawk.widget;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Binder;
-import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -83,7 +82,10 @@ public class QuotesWidgetRemoteViewsService extends RemoteViewsService {
                     views.setTextViewText(change, mData.getString(mData.getColumnIndex("change")));
                 }
 
-                Log.d("QuotesWidget", "remote views completed, returning");
+                final Intent fillInIntent = new Intent();
+                fillInIntent.setData(QuoteProvider.Quotes.withSymbol(
+                        mData.getString(mData.getColumnIndex(QuoteColumns.SYMBOL))));
+                views.setOnClickFillInIntent(R.id.widget_list_item, fillInIntent);
 
                 return views;
             }

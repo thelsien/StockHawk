@@ -20,6 +20,19 @@ import com.sam_chordas.android.stockhawk.ui.StockDetailsActivity;
  */
 
 public class QuotesWidgetProvider extends AppWidgetProvider {
+
+    public static final String WIDGET_IDS_KEY = "quotes_widget_ids_key";
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if (intent.hasExtra(WIDGET_IDS_KEY)) {
+            int[] ids = intent.getExtras().getIntArray(WIDGET_IDS_KEY);
+            onUpdate(context, AppWidgetManager.getInstance(context), ids);
+        } else {
+            super.onReceive(context, intent);
+        }
+    }
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         for (int appWidgetId : appWidgetIds) {

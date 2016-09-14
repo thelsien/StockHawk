@@ -33,7 +33,6 @@ public class StockDetailsActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = StockDetailsActivity.class.getSimpleName();
     private HashMap<Float, String> valueDateHashMap = new HashMap<>();
-    private LineChart upYAxis;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,6 +107,9 @@ public class StockDetailsActivity extends AppCompatActivity {
         xAxis.setValueFormatter(new AxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
+                if (valueDateHashMap.get(value) == null) {
+                    return "";
+                }
                 return valueDateHashMap.get(value);
             }
 
