@@ -133,6 +133,8 @@ public class StockTaskService extends GcmTaskService {
                     }
                     mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
                             Utils.quoteJsonToContentVals(getResponse));
+
+                    updateWidgets();
                 } catch (RemoteException | OperationApplicationException e) {
                     Log.e(LOG_TAG, "Error applying batch insert", e);
                 } catch (NumberFormatException e) {
@@ -150,6 +152,10 @@ public class StockTaskService extends GcmTaskService {
         }
 
         return result;
+    }
+
+    private void updateWidgets() {
+
     }
 
 }

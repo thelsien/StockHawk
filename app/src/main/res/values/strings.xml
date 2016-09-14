@@ -16,4 +16,5 @@
     <string name="linechart_description_string">Quote data for <xliff:g id="quote_name">%1$s</xliff:g></string>
     <string name="empty_quotes_list">The list is currently empty. Add new quotes to the list in the app.</string>
     <string name="title_widget_list">StockHawk List Widget</string>
+    <string name="stock_already_saved">This stock is already saved!</string>
 </resources>

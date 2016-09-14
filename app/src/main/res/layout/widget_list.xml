@@ -10,7 +10,7 @@
         android:id="@+id/widget"
         android:layout_width="match_parent"
         android:layout_height="@dimen/abc_action_bar_default_height_material"
-        android:background="@color/material_blue_700">
+        android:background="@color/material_blue_500">
 
         <TextView
             android:layout_width="match_parent"
@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/material_blue_500">
+        android:background="@color/material_gray_900">
 
         <ListView
             android:id="@+id/widget_list"
