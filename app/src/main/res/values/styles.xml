@@ -8,19 +8,37 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="CenteredWrappedText">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
     <style name="PercentChangeTextStyle">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">#FFF</item>
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="PercentChangeWidgetTextStyle" parent="PercentChangeTextStyle">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="BidPriceTextStyle">
         <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="BidPriceWidgetTextStyle" parent="BidPriceTextStyle">
+        <item name="android:textSize">16sp</item>
     </style>
 
     <style name="StockSymbolTextStyle">
         <item name="android:textSize">25sp</item>
         <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="StockSymbolWidgetTextStyle" parent="StockSymbolTextStyle">
+        <item name="android:textSize">20sp</item>
     </style>
 
 </resources>

@@ -122,7 +122,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             public void onClick(View v) {
                 if (Utils.isConnectedToNetwork(mContext)) {
                     new MaterialDialog.Builder(mContext).title(R.string.symbol_search)
-                            .content(R.string.content_test)
+                            .content(R.string.symbol_search_content)
                             .inputType(InputType.TYPE_CLASS_TEXT)
                             .input(R.string.input_hint, R.string.input_prefill, new MaterialDialog.InputCallback() {
                                 @Override
@@ -254,11 +254,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         if (id == R.id.action_change_units) {
             // this is for changing stock changes from percent value to dollar value

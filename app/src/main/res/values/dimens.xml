@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
@@ -10,4 +10,10 @@
     <dimen name="widget_list_min_resize_height">@dimen/widget_list_default_height</dimen>
     <dimen name="widget_list_min_resize_width">220dp</dimen>
     <dimen name="widget_list_default_width">250dp</dimen>
+    <dimen name="padding_16dp">16dp</dimen>
+    <dimen name="padding_10dp">10dp</dimen>
+    <dimen name="padding_3dp">3dp</dimen>
+    <dimen name="padding_8dp">8dp</dimen>
+    <dimen name="widget_header_height">56dp</dimen>
+    <dimen name="chart_height">350dp</dimen>
 </resources>
