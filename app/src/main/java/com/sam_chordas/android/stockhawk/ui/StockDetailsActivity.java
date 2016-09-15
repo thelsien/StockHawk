@@ -34,6 +34,7 @@ public class StockDetailsActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = StockDetailsActivity.class.getSimpleName();
     private HashMap<Float, String> valueDateHashMap = new HashMap<>();
+    private Uri mQuoteUri;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,11 +42,16 @@ public class StockDetailsActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_line_graph);
 
-        Uri quoteUri = getIntent().getData();
-        Log.d(LOG_TAG, quoteUri.toString());
+        if (savedInstanceState != null) {
+            mQuoteUri = savedInstanceState.getParcelable(getString(R.string.saved_quote_uri_key));
+        } else {
+            mQuoteUri = getIntent().getData();
+        }
+
+        Log.d(LOG_TAG, mQuoteUri.toString());
 
         Cursor c = getContentResolver().query(
-                quoteUri,
+                mQuoteUri,
                 null,
                 null,
                 null,
@@ -64,7 +70,7 @@ public class StockDetailsActivity extends AppCompatActivity {
                 LineChart lineChartView = (LineChart) findViewById(R.id.linechart);
                 if (lineChartView != null) {
 
-                    LineDataSet lineDataSet = getLineDataSet(quoteUri, c);
+                    LineDataSet lineDataSet = getLineDataSet(mQuoteUri, c);
                     lineDataSet.setColor(ColorTemplate.getHoloBlue());
                     lineChartView.setData(new LineData(lineDataSet));
 
@@ -83,7 +89,7 @@ public class StockDetailsActivity extends AppCompatActivity {
 
                     lineChartView.setPinchZoom(false);
                     lineChartView.setScaleEnabled(false);
-                    lineChartView.setDescription(String.format(getString(R.string.linechart_description_string), quoteUri.getLastPathSegment()));
+                    lineChartView.setDescription(String.format(getString(R.string.linechart_description_string), mQuoteUri.getLastPathSegment()));
 
                     lineChartView.invalidate();
                 }
@@ -91,6 +97,12 @@ public class StockDetailsActivity extends AppCompatActivity {
 
             c.close();
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(getString(R.string.saved_quote_uri_key), mQuoteUri);
+        super.onSaveInstanceState(outState);
     }
 
     @NonNull
