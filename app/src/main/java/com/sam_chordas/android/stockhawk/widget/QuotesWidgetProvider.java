@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -12,6 +13,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
 import com.sam_chordas.android.stockhawk.R;
+import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.sam_chordas.android.stockhawk.ui.MyStocksActivity;
 import com.sam_chordas.android.stockhawk.ui.StockDetailsActivity;
 
@@ -21,15 +23,14 @@ import com.sam_chordas.android.stockhawk.ui.StockDetailsActivity;
 
 public class QuotesWidgetProvider extends AppWidgetProvider {
 
-    public static final String WIDGET_IDS_KEY = "quotes_widget_ids_key";
-
     @Override
-    public void onReceive(Context context, Intent intent) {
-        if (intent.hasExtra(WIDGET_IDS_KEY)) {
-            int[] ids = intent.getExtras().getIntArray(WIDGET_IDS_KEY);
-            onUpdate(context, AppWidgetManager.getInstance(context), ids);
-        } else {
-            super.onReceive(context, intent);
+    public void onReceive(@NonNull Context context, @NonNull Intent intent) {
+        super.onReceive(context, intent);
+        if (StockTaskService.ACTION_DATA_UPDATED.equals(intent.getAction())) {
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(
+                    new ComponentName(context, getClass()));
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
         }
     }
 

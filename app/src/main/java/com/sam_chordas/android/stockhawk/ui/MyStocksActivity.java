@@ -1,8 +1,6 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.app.LoaderManager;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -38,7 +36,6 @@ import com.sam_chordas.android.stockhawk.rest.Utils;
 import com.sam_chordas.android.stockhawk.service.StockIntentService;
 import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
-import com.sam_chordas.android.stockhawk.widget.QuotesWidgetProvider;
 
 public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -287,21 +284,10 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCursorAdapter.swapCursor(data);
         mCursor = data;
-
-        updateWidgets();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mCursorAdapter.swapCursor(null);
-    }
-
-    private void updateWidgets() {
-        AppWidgetManager widgetManager = AppWidgetManager.getInstance(mContext);
-        int[] ids = widgetManager.getAppWidgetIds(new ComponentName(mContext, QuotesWidgetProvider.class));
-        Intent updateIntent = new Intent();
-        updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        updateIntent.putExtra(QuotesWidgetProvider.WIDGET_IDS_KEY, ids);
-        mContext.sendBroadcast(updateIntent);
     }
 }

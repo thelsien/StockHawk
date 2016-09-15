@@ -2,6 +2,7 @@ package com.sam_chordas.android.stockhawk.service;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -31,6 +32,9 @@ import java.net.URLEncoder;
  * and is used for the initialization and adding task as well.
  */
 public class StockTaskService extends GcmTaskService {
+    public static final String ACTION_DATA_UPDATED =
+            "com.sam_chordas.android.stockhawk.ACTION_DATA_UPDATED";
+
     private String LOG_TAG = StockTaskService.class.getSimpleName();
 
     private OkHttpClient client = new OkHttpClient();
@@ -133,6 +137,8 @@ public class StockTaskService extends GcmTaskService {
                     }
                     mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
                             Utils.quoteJsonToContentVals(getResponse));
+
+                    updateWidgets();
                 } catch (RemoteException | OperationApplicationException e) {
                     Log.e(LOG_TAG, "Error applying batch insert", e);
                 } catch (NumberFormatException e) {
@@ -150,5 +156,18 @@ public class StockTaskService extends GcmTaskService {
         }
 
         return result;
+    }
+
+    private void updateWidgets() {
+//        AppWidgetManager widgetManager = AppWidgetManager.getInstance(mContext);
+//        int[] ids = widgetManager.getAppWidgetIds(new ComponentName(mContext, QuotesWidgetProvider.class));
+//        Intent updateIntent = new Intent();
+//        updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+//        updateIntent.putExtra(QuotesWidgetProvider.WIDGET_IDS_KEY, ids);
+//        mContext.sendBroadcast(updateIntent);
+        // Setting the package ensures that only components in our app will receive the broadcast
+        Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED)
+                .setPackage(mContext.getPackageName());
+        mContext.sendBroadcast(dataUpdatedIntent);
     }
 }
