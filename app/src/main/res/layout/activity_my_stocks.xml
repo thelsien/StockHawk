@@ -40,6 +40,7 @@
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/padding_16dp"
         android:src="@drawable/ic_add_white_24dp"
+        android:contentDescription="@string/add_button_content_description"
         fab:fab_colorNormal="@color/material_blue_500"
         fab:fab_colorPressed="@color/material_blue_600"
         fab:fab_colorRipple="@color/ripple"
